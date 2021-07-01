@@ -1,8 +1,8 @@
-com/avenger/bmp/JustPureImage.java
- com.avenger.bmp.JustPureImage
-com/avenger/bmp/Depth.java
- com.avenger.bmp.Depth
-com/avenger/bmp/JustPureVideo.java
- com.avenger.bmp.JustPureVideo
 com/avenger/bmp/Main.java
  com.avenger.bmp.Main
+com/avenger/bmp/JustPureImage.java
+ com.avenger.bmp.JustPureImage
+com/avenger/bmp/JustPureVideo.java
+ com.avenger.bmp.JustPureVideo
+com/avenger/bmp/Depth.java
+ com.avenger.bmp.Depth

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 
 public class JustPureVideo {
@@ -43,6 +44,34 @@ public class JustPureVideo {
         validate(keys);
 
         return new JustPureVideo(keys[0].width, keys[0].height, keys[0].depth, keys);
+    }
+
+    static JustPureVideo load(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) throw new FileNotFoundException("File is not found");
+
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        if (bytes.length < 10) {
+            return null;
+        }
+
+        Depth depth = Depth.get(bytes[0] & 0xFF);
+        int width = (bytes[1] & 0xFF) << 8 | bytes[2] & 0xFF;
+        int height = (bytes[3] & 0xFF) << 8 | bytes[4] & 0xFF;
+        int count = (bytes[5] & 0xFF) << 8 | bytes[6] & 0xFF;
+
+        JustPureImage[] keys = new JustPureImage[count];
+        int off = 7;
+        for (int i = 0; i < count; i++) {
+            byte[] bits = new byte[width * height * depth.bytes + 5];
+            for (int j = 5; j < bits.length; j++) {
+                bits[j] = bytes[off];
+                off++;
+            }
+            keys[i] = new JustPureImage(width, height, bits, depth);
+        }
+
+        return new JustPureVideo(width, height, depth, keys);
     }
 
 
@@ -85,12 +114,12 @@ public class JustPureVideo {
         bytes[5] = (byte) (((short) keys.length) >> 8); //Encode first byte of keys count
         bytes[6] = (byte) (((short) keys.length) & 0xFF);
 
-        int i = 0;
+        int i = 7;
         for (JustPureImage img : keys) {
             for (int j = 5; j < img.bitmap.length; j++) {
-                bytes[i + j] = img.bitmap[j];
+                bytes[i] = img.bitmap[j];
+                i++;
             }
-            i += img.bitmap.length - 5;
         }
 
 
